@@ -184,6 +184,7 @@ export default {
   },
   created() {
     this.loadUsers();
+    setInterval(()=> this.loadUsers(), 3000);
   }
   // mounted() {
   //     console.log('Component mounted.ssss')

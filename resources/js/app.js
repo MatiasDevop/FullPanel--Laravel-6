@@ -25,9 +25,9 @@ const toast = swal.mixin({
       toast.addEventListener('mouseleave', Swal.resumeTimer)
     }
   });
-  
-  window.toast = toast;
 
+  window.toast = toast;
+ /**end sweet alert section */ 
 window.Form = Form;
 Vue.component(HasError.name, HasError)
 Vue.component(AlertError.name, AlertError)
