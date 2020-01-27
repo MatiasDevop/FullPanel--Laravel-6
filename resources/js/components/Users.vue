@@ -125,8 +125,7 @@
                 <has-error :form="form" field="type"></has-error>
               </div>
               <div class="form-group">
-                <label>password
-                </label>
+                <label>password</label>
                 <input
                   v-model="form.password"
                   type="password"
@@ -164,16 +163,26 @@ export default {
       })
     };
   },
-  methods:{
-      loadUsers(){
-        axios.get("api/user")//here we are using axios and function arrow
-        .then(({ data }) =>(this.users = data.data));
-      },
-      createUser(){
-          this.form.post('api/user');
-      }
+  methods: {
+    loadUsers() {
+      axios
+        .get("api/user") //here we are using axios and function arrow
+        .then(({ data }) => (this.users = data.data));
+    },
+    createUser() {
+      this.$Progress.start();
+      this.form.post("api/user");
+
+      $('#addNewModal').modal('hide');
+      toast.fire({
+        icon: "success",
+        title: "User created successfully"
+      });
+
+      this.$Progress.finish();
+    }
   },
-  created(){
+  created() {
     this.loadUsers();
   }
   // mounted() {

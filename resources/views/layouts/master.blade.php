@@ -190,6 +190,8 @@
                 <div class="content">
                     <div class="">
                         <router-view></router-view>
+                         <!-- set progressbar -->
+                         <vue-progress-bar></vue-progress-bar>
                     </div>
                 </div>
            {{-- @yield('content') --}}
