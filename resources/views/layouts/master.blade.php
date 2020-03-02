@@ -150,6 +150,16 @@
                                 <p class="text">Contacto</p>
                             </a>
                         </li>
+                        {{-- Using AuthserviceProvider --}}
+                        @can('isAdmin')
+                        <li class="nav-item">
+                            <router-link to="/developer" class="nav-link">
+                                <i class="nav-icon fa fa-tasks text-primary"></i>
+                                <p class="text">Developer</p>
+                            </router-link>
+                        </li>
+                        @endcan
+
                         <li class="nav-item">
                             <router-link to="/profile" class="nav-link">
                                 <i class="nav-icon fa fa-circle-o text-primary"></i>

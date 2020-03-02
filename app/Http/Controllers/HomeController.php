@@ -11,7 +11,7 @@ class HomeController extends Controller
      *
      * @return void
      */
-    public function __construct()
+    public function __construct()//this is which dosent let me entry in mi homepage you need to authenticated
     {
         $this->middleware('auth');
     }

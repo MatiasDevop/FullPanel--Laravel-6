@@ -18,12 +18,12 @@ const toast = swal.mixin({
     toast: true,
     position: 'top-end',
     showConfirmButton: false,
-    timer: 3000,
-    timerProgressBar: true,
-    onOpen: (toast) => {
-      toast.addEventListener('mouseenter', Swal.stopTimer)
-      toast.addEventListener('mouseleave', Swal.resumeTimer)
-    }
+    timer: 2000
+    // timerProgressBar: true,
+    // onOpen: (toast) => {
+    //   toast.addEventListener('mouseenter', swal.stopTimer)
+    //   toast.addEventListener('mouseleave', swal.resumeTimer)
+    // }
   });
 
   window.toast = toast;
@@ -50,6 +50,9 @@ let routes = [
     { path: '/profile', 
         component: require('./components/Profile.vue').default
     },
+    { path: '/developer', 
+      component: require('./components/Developer.vue').default
+    },
     { path: '/users', 
         component: require('./components/Users.vue').default
     }
@@ -70,7 +73,7 @@ const router = new VueRouter({
         return moment(created).format('MMM Do YYYY')
   });
 
-
+  window.Fire = new Vue();
 
 
 /**
@@ -83,6 +86,21 @@ const router = new VueRouter({
 
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
+
+Vue.component(
+  'passport-clients',
+  require('./components/passport/Clients.vue').default
+);
+
+Vue.component(
+  'passport-authorized-clients',
+  require('./components/passport/AuthorizedClients.vue').default
+);
+
+Vue.component(
+  'passport-personal-access-tokens',
+  require('./components/passport/PersonalAccessTokens.vue').default
+);
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 

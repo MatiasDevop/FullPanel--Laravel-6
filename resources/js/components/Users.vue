@@ -7,7 +7,7 @@
             <h3 class="card-title">Users table</h3>
 
             <div class="card-tools">
-              <button class="btn btn-success" data-toggle="modal" data-target="#addNewModal">
+              <button class="btn btn-success" @click="newModal">
                 Add new
                 <i class="fa fa-user-plus fa-fw"></i>
               </button>
@@ -34,11 +34,11 @@
                   <td>{{item.type | upText}}</td>
                   <td>{{item.created_at | myDate}}</td>
                   <td>
-                    <a href="#">
+                    <a href="#" @click="editModal(item)">
                       <i class="fa fa-edit blue"></i>
                     </a>
                     /
-                    <a href="#">
+                    <a href="#" @click="deleteUser(item.id)">
                       <i class="fa fa-trash red"></i>
                     </a>
                   </td>
@@ -64,12 +64,16 @@
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="addNewModalLabel">Add New</h5>
+            <h5 class="modal-title" v-show="!editmode" id="addNewModalLabel">Add New</h5>
+            <h5 class="modal-title" v-show="editmode" id="addNewModalLabel">Update New</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <form @submit.prevent="createUser">
+          <form
+            @submit.prevent="editmode ? updateUser() : createUser()"
+            @keydown="form.onKeydown($event)"
+          >
             <div class="modal-body">
               <div class="form-group">
                 <label>Username</label>
@@ -139,7 +143,8 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-              <button type="submit" class="btn btn-primary">Create</button>
+              <button v-show="editmode" type="submit" class="btn btn-success">Update</button>
+              <button v-show="!editmode" type="submit" class="btn btn-primary">Create</button>
             </div>
           </form>
         </div>
@@ -152,8 +157,11 @@
 export default {
   data() {
     return {
+      editmode: false,
       users: {},
       form: new Form({
+        //this form is to use for all component
+        id: "",
         name: "",
         email: "",
         password: "",
@@ -164,6 +172,38 @@ export default {
     };
   },
   methods: {
+    updateUser() {
+      this.$Progress.start();
+
+      this.form
+        .put("api/user/" + this.form.id)
+        .then(() => {
+          //success
+          $('#addNewModal').modal('hide');
+          swal.fire("Updated!", "Your file has been updated.", "success");
+          this.$Progress.finish();
+          Fire.$emit("AfterCreate");
+        })
+        .catch(() => {
+          this.$Progress.fail();
+        });
+    },
+
+    editModal(item) {
+      this.editmode = true;
+      this.form.reset();
+      $("#addNewModal").modal("show");
+      //$(".modal-backdrop").remove();
+      this.form.fill(item);
+    },
+
+    newModal() {
+      this.editmode = false;
+      this.form.reset();
+      $("#addNewModal").modal("show");
+      // $(".modal-backdrop").remove();
+    },
+
     loadUsers() {
       axios
         .get("api/user") //here we are using axios and function arrow
@@ -171,20 +211,68 @@ export default {
     },
     createUser() {
       this.$Progress.start();
-      this.form.post("api/user");
 
-      $('#addNewModal').modal('hide');
-      toast.fire({
-        icon: "success",
-        title: "User created successfully"
-      });
+      this.form
+        .post("api/user")
+        .then(response => {
+          // with promises ECMA6
+          Fire.$emit("AfterCreate"); // emmit an event after action an it trigger inmediatly
 
-      this.$Progress.finish();
+          toast.fire({
+            icon: "success",
+            title: "User created successfully"
+          });
+          //.then(()=>{
+          //     console.log(response.data);
+          //   if(response.data!=null){
+          //      bus.$emit('AfterCreate');
+          //   }
+          // })
+
+          $("#addNewModal").modal("hide");
+          $(".modal-backdrop").remove();
+
+          this.$Progress.finish();
+        })
+        .catch(() => {
+          console.log("Error");
+        });
+    },
+    deleteUser(id) {
+      //modal alert to delete
+      swal
+        .fire({
+          title: "Are you sure?",
+          text: "You won't be able to revert this!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, delete it!"
+        })
+        .then(result => {
+          //Sedn request to the server controller/api .destroy
+          if (result.value) {
+            this.form
+              .delete("api/user/" + id)
+              .then(() => {
+                swal.fire("Deleted!", "Your file has been deleted.", "success");
+                Fire.$emit("AfterCreate");
+              })
+              .catch(() => {
+                swal.fire("Failed!", "There was something wrong.", "Warning");
+              });
+          }
+        });
     }
   },
   created() {
     this.loadUsers();
-    setInterval(()=> this.loadUsers(), 3000);
+    Fire.$on("AfterCreate", () => {
+      this.loadUsers();
+    });
+
+    //setInterval(()=> this.loadUsers(), 3000);
   }
   // mounted() {
   //     console.log('Component mounted.ssss')
